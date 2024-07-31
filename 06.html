@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMX Searcher</title>
+    <style>
+        /* Estilos para el cuerpo y el encabezado */
+        body, head {
+            margin: 0;
+	    background-color: black;
+        }
+		
+        .digit-list {
+			display: none;
+		}
+	
+
+
+		.image-list {
+			background-color: #333; /* Fondo oscuro */
+			padding: 0px; /* Espacio interno */
+			max-width: 240px; /* Ancho máximo */
+			margin: 0 auto; /* Centrar horizontalmente */
+			list-style-type: none; /* Quitar estilos de lista (viñetas, números) */
+		}
+
+		.image-list li {
+			color: #fff; /* Color de texto blanco */
+			font-family: Arial, sans-serif; /* Fuente del texto */
+			font-size: 11px; /* Tamaño de fuente más pequeño */
+			padding: 5px 8px; /* Espacio interno en cada ítem de la lista */
+			margin-bottom: 1px; /* Margen inferior entre ítems */
+			border-radius: 3px; /* Bordes redondeados */
+			line-height: 1.0; /* Altura de línea para mejor legibilidad */
+		}
+
+		.image-list li:hover {
+			background-color: #FF05; /* Cambio de color al pasar el ratón */
+			cursor: pointer; /* Cursor tipo puntero al pasar el ratón */
+		}
+	
+	
+
+        /* Estilos para la barra lateral */
+        .sidebar {
+            width: 16.666%;
+            height: 100%;
+            background: #2f2f2f;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* Estilos para los dígitos */
+        .digit, .image-count, .min-limit, .max-limit{
+            color: #c4c4c4;
+            font-size: 0.8cm;
+            font-family: 'Courier New', monospace;
+            width: 5.2em;
+            text-align: center;
+            border: 4px solid #10D3D0;
+            border-radius: 4px;
+            margin: 5px;
+            height: 1.0em;
+        }
+
+
+
+
+        /* Estilos para los botones */
+        .buttons {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        button {
+            background: #2f2f2f;
+            border: none;
+            padding: 3px 20px;
+            font-size: 14px;
+            border-radius: 4px;
+            color: #c4c4c4;
+            box-shadow: 1px 1px 5px #000, -1px -1px 5px #6f6f6f, inset 1px 1px 5px #2b2b2b, inset -1px -1px 5px #424242;
+            transition: all 0.1s;
+            cursor: pointer;
+            margin: 5px;
+	    font-family: 'Courier New', monospace;
+        }
+
+        button:active {
+            box-shadow: 1px 1px 5px #5b5b5b, -1px -1px 5px #000, inset 1px 1px 5px #5b5b5b, inset -1px -1px 5px #000;
+        }
+
+        .plus-button, .minus-button, .random-button, .save-button {
+            font-size: 14px;
+        }
+
+        .random-button, .save-button {
+            order: 1;
+        }
+
+        /* Estilos para la parte derecha */
+        .right-content {
+            flex: 1;
+            margin-left: 17%;
+            padding: 20px;
+            background: yellow;
+            overflow: auto;
+        }
+
+        .image-grid {
+            background: #2f2f2f;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .image-grid img {
+            background: #2f2f2f;
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px !important;
+            font-weight: bold;
+            color: #FFFFFF !important;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="max-limit" id="maxlimit" contenteditable="true" >12000</div>
+        <div class="min-limit" id="minlimit" contenteditable="true" >0000</div>
+        <div class="digit" id="digit" contenteditable="true" oninput="updateDigitDisplay()">9er9</div>
+        <div class="image-count" id="imageCount">0</div>
+
+	<div class="buttons">
+	<button class="new-button-left" onclick="selectPreviousElement()">ANTERI</button>
+	<button class="new-button-right" onclick="selectNextElement()">POSTER</button>
+	<button class="minus-button" onclick="decrementValue()">------</button>
+	<button class="plus-button" onclick="incrementValue()">++++++</button>
+	<button class="random-button" onclick="generateRandomDigits()">RANDOM</button>
+	<button class="save-button" onclick="copyToClipboardAndSave()">_SAVE_</button>
+	</div>
+	<div class="buttons">
+	<button class="0000-button" onclick="set0()">_0000_</button>
+	<button class="open-button" onclick="openlist()">_OPEN_</button>
+	<button class="zzzz-button" onclick="setz()">_ZZZZ_</button>
+	</div>
+	
+	
+        <ul class="digit-list" id="digitList">
+            <!-- Aquí se mostrarán los dígitos -->
+        </ul>
+	
+	
+	
+        <ul class="image-list" id="imageList">
+            <!-- Aquí se mostrarán las imagenes -->
+        </ul>
+
+
+
+	
+	
+    </div>
+
+    <div class="right-content" id="rightContent">
+        <!-- Aquí se mostrará el contenido descargado -->
+    </div>
+
+    <textarea id="clipboardTextarea" style="position: absolute; left: -9999px; top: -9999px;"></textarea>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+
+    
+    <script>
+        var imageList = [];
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+
+	
+function downloadAndDisplayContent(code) {
+    imageList = [];
+    // var url = "https://cors.goonlinetools.workers.dev/?https://imx.to/g/" + code;
+	var url = "https://api.allorigins.win/raw?url=https://imx.to/g/" + code;
+
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            var contentDiv = document.createElement('div');
+            contentDiv.innerHTML = data;
+            var images = contentDiv.querySelectorAll('img[src*="/t/"]');
+            var title = contentDiv.querySelector('.title');
+
+            if (images && images.length > 1) {
+                var imageGrid = document.createElement('div');
+                imageGrid.classList.add('image-grid');
+
+                var imageListElement = document.getElementById('imageList');
+                imageListElement.innerHTML = ''; // Limpiar la lista antes de actualizar
+
+                images.forEach(function (image) {
+                    var imgSrc = image.src;
+                    if (!imageList.includes(imgSrc)) {
+                        var img = document.createElement('img');
+                        img.src = imgSrc;
+                        img.addEventListener('click', function () {
+                            openImageInNewWindow(imgSrc.replace('/t/', '/i/'));
+                        });
+                        imageGrid.appendChild(img);
+                        imageList.push(imgSrc);
+
+                        // Añadir la ruta de la imagen a la lista
+                        var listItem = document.createElement('li');
+                        listItem.textContent = imgSrc;
+                        imageListElement.appendChild(listItem);
+                    }
+                });
+
+                var titleElement = document.createElement('div');
+                titleElement.innerHTML = title ? title.outerHTML : '';
+                document.getElementById('rightContent').style.backgroundColor = '#008000';
+
+                document.getElementById('rightContent').innerHTML = '';
+                document.getElementById('rightContent').appendChild(titleElement);
+                document.getElementById('rightContent').appendChild(imageGrid);
+
+                // Actualizar la cantidad de imágenes
+                document.getElementById('imageCount').textContent = imageList.length;
+            } else {
+                document.getElementById('rightContent').style.backgroundColor = '#FF0000';
+                document.getElementById('rightContent').textContent = "____";
+                document.getElementById('imageCount').textContent = "0";
+            }
+        })
+        .catch(error => {
+            document.getElementById('rightContent').style.backgroundColor = '#FF0000';
+            document.getElementById('rightContent').textContent = "Error";
+            document.getElementById('imageCount').textContent = "0";
+        });
+}
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	function setz() {
+		var digitElement = document.getElementById('digit');
+		var digitText = digitElement.textContent;
+		if (digitText.length > 0) {
+			digitElement.textContent = digitText.slice(0, -1) + 'z';
+		}
+		incrementValue();
+	}
+	
+	function set0() {
+		var digitElement = document.getElementById('digit');
+		var digitText = digitElement.textContent;
+		if (digitText.length > 0) {
+			digitElement.textContent = digitText.slice(0, -1) + '0';
+		}
+		decrementValue();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	async function procesarString(inputString) {
+	    try {
+		var resultado = await encontrarImagenExistente(inputString);
+		return resultado;
+	    } catch (error) {
+		console.error("Error al procesar el argumento:", error);
+		return null;
+	    }
+	}	
+	
+	
+	
+	
+
+
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		async function copyToClipboardAndSave() {
+		  var digit = document.getElementById('digit').textContent;
+		  var titleElement = document.querySelector('.title');
+		  var title = titleElement ? titleElement.textContent.trim() : '';
+
+		  var imageLinks = imageList.map(function (link) {
+		    var imageLink = link.substring(link.indexOf('https://imx.to/u/t/') + 19);
+		    return imageLink;
+		  });
+
+		  // Procesar cada imageLink y almacenar los resultados
+		  var resultados = [];
+
+		  for (let i = 0; i < imageLinks.length; i++) {
+		    var inputString = imageLinks[i];
+
+		    try {
+		      var resultado = await procesarString(inputString);
+		      resultados.push(resultado);
+		    } catch (error) {
+		      console.error("Error al procesar el argumento:", error);
+		      resultados.push(null);
+		    }
+		  }
+
+		var nombreZip = "IMX" + document.getElementById('digit').textContent + "_" + document.getElementById('rightContent').textContent;
+		descargarImagenesYCrearZip(resultados, nombreZip);
+
+
+		}
+
+	
+	
+	
+	
+	
+	
+	
+async function encontrarImagenExistente(nombreImagen) {
+    const baseUrls = [
+        "https://cors.goonlinetools.workers.dev/?https://i001.imx.to/i/",
+        "https://cors.goonlinetools.workers.dev/?https://i002.imx.to/i/",
+        "https://cors.goonlinetools.workers.dev/?https://i003.imx.to/i/",
+        "https://cors.goonlinetools.workers.dev/?https://i004.imx.to/i/",
+        "https://cors.goonlinetools.workers.dev/?https://i005.imx.to/i/",
+        "https://cors.goonlinetools.workers.dev/?https://i006.imx.to/i/"
+    ];
+
+    for (const baseUrl of baseUrls) {
+        const imageUrl = baseUrl + nombreImagen;
+        
+        try {
+            const response = await fetch(imageUrl);
+            
+            if (response.ok) {
+		return imageUrl; // Retorna la URL completa si la imagen existe y tiene un tamaño mayor a 0
+            }
+        } catch (error) {
+            console.error(`Error al verificar la imagen ${imageUrl}: ${error}`);
+        }
+    }
+
+    return null; // Retorna null si ninguna imagen existe
+}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		  function descargarImagenesYCrearZip(imagenes, tituloZip) {
+		    var zip = new JSZip();
+
+		    function descargarYAgregarAlZip(url, nombreArchivo) {
+		      return fetch(url)
+			.then(response => response.arrayBuffer())
+			.then(data => zip.file(nombreArchivo, data));
+		    }
+
+		    var promesasDescarga = [];
+
+		    imagenes.forEach((imagen, indice) => {
+
+		      var nombreArchivo = `${String(indice + 1).padStart(4, '0')}.jpg`;
+
+
+		      promesasDescarga.push(descargarYAgregarAlZip(imagen, nombreArchivo));
+		    });
+
+		    Promise.all(promesasDescarga)
+		      .then(() => zip.generateAsync({ type: 'blob' }))
+		      .then(blob => {
+			var link = document.createElement('a');
+			link.href = URL.createObjectURL(blob);
+			link.download = `${tituloZip}.zip`;
+			link.click();
+		      })
+		      .catch(error => console.error('Error:', error));
+		  }
+
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+        function copyTextToClipboard(text) {
+            var clipboardTextarea = document.getElementById('clipboardTextarea');
+            clipboardTextarea.value = text;
+            clipboardTextarea.select();
+            document.execCommand('copy');
+        }
+
+		function incrementValue() {
+			var digit = document.getElementById('digit').textContent.toLowerCase();
+			var length = digit.length;
+			var maxVal = 36 ** length;
+			var intValue = parseInt(digit, 36);
+			intValue = (intValue + 1) % maxVal;
+			var newDigit = intValue.toString(36).padStart(length, '0');
+			document.getElementById('digit').textContent = newDigit;
+			downloadAndDisplayContent(newDigit);
+			updateDigitList(newDigit);
+		}
+
+
+
+		function decrementValue() {
+			var digit = document.getElementById('digit').textContent.toLowerCase();
+			var length = digit.length;
+			var maxVal = 36 ** length;
+			var intValue = parseInt(digit, 36);
+			intValue = (intValue - 1 + maxVal) % maxVal;
+			var newDigit = intValue.toString(36).padStart(length, '0');
+			document.getElementById('digit').textContent = newDigit;
+			downloadAndDisplayContent(newDigit);
+			updateDigitList(newDigit);
+		}
+
+
+
+		function generateRandomDigits() {
+			// Obtener los límites de los cuadros de texto
+			var minLimit = document.getElementById('minlimit').textContent.toLowerCase();
+			var maxLimit = document.getElementById('maxlimit').textContent.toLowerCase();
+
+			// Convertir los límites a enteros en base 36
+			var minInt = parseInt(minLimit, 36);
+			var maxInt = parseInt(maxLimit, 36);
+
+			// Verificar que los límites sean válidos
+			if (isNaN(minInt) || isNaN(maxInt) || minInt >= maxInt) {
+				alert('Por favor, ingrese límites válidos.');
+				return;
+			}
+
+			// Generar un número aleatorio dentro de los límites
+			var randomInt = Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt;
+
+			// Convertir el número aleatorio de vuelta a una cadena en base 36
+			var randomDigits = randomInt.toString(36);
+
+			// Actualizar el contenido del elemento HTML y llamar a las funciones adicionales
+			document.getElementById('digit').textContent = randomDigits;
+			downloadAndDisplayContent(randomDigits);
+			updateDigitList(randomDigits);
+		}
+
+
+
+
+        function openImageInNewWindow(imageUrl) {
+            window.open(imageUrl);
+        }
+
+
+	
+	
+	
+	
+	function openlist() {
+		var titleElement = document.querySelector('.title');
+		var title = titleElement ? titleElement.textContent.trim() : 'No Title';
+		var imageListElement = document.getElementById('imageList');
+		var imageListItems = imageListElement.getElementsByTagName('li');
+		
+		var imageUrls = Array.from(imageListItems).map(item => item.textContent).join('\r\n');
+		
+		var content = `${title}\r\n${imageUrls}`;
+		
+		var now = new Date();
+		var year = now.getFullYear().toString().slice(-2);
+		var month = (now.getMonth() + 1).toString().padStart(2, '0');
+		var day = now.getDate().toString().padStart(2, '0');
+		var hours = now.getHours().toString().padStart(2, '0');
+		var minutes = now.getMinutes().toString().padStart(2, '0');
+		var seconds = now.getSeconds().toString().padStart(2, '0');
+		
+		var digit = document.getElementById('digit').textContent.trim();
+		// Cambiar el nombre del archivo para usar el dígito actual
+		var fileName = `${digit}.dlr`;
+		
+		var blob = new Blob([content], { type: 'text/plain' });
+		var link = document.createElement('a');
+		link.href = URL.createObjectURL(blob);
+		link.download = fileName;
+		link.click();
+		incrementValue();
+	}
+
+	
+	
+	
+	
+	function updateDigitList(newDigit) {
+	    var digitList = document.getElementById('digitList');
+	    var listItems = Array.from(digitList.children);
+
+	    // Eliminar la clase "selected" de todos los elementos de la lista
+	    listItems.forEach(item => item.classList.remove('selected'));
+
+	    // Verificar si el dígito ya está en la lista
+	    var isDuplicate = listItems.some(item => item.textContent === newDigit);
+
+	    if (isDuplicate) {
+		// Si el dígito ya existe en la lista, seleccionar el último elemento
+		var lastItem = listItems[listItems.length - 1];
+		lastItem.classList.add('selected');
+	    } else {
+		// Si el dígito no existe en la lista, agregar un nuevo elemento y seleccionarlo
+		var listItem = document.createElement('li');
+		listItem.textContent = newDigit;
+		listItem.classList.add('selected'); // Agregar la clase "selected" al nuevo elemento
+		digitList.appendChild(listItem);
+	    }
+	}
+
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+	
+function selectPreviousElement() {
+    var digitList = document.getElementById('digitList');
+    var listItems = Array.from(digitList.children);
+
+    // Encuentra el elemento actualmente seleccionado
+    var selectedItem = listItems.find(item => item.classList.contains('selected'));
+
+    if (selectedItem) {
+        // Encuentra el índice del elemento seleccionado
+        var selectedIndex = listItems.indexOf(selectedItem);
+
+        if (selectedIndex > 0) {
+            // Deselecciona el elemento actual
+            selectedItem.classList.remove('selected');
+
+            // Selecciona el elemento anterior
+            listItems[selectedIndex - 1].classList.add('selected');
+
+            // Actualiza el valor del cuadro de texto con el valor del elemento seleccionado
+            document.getElementById('digit').textContent = listItems[selectedIndex - 1].textContent;
+
+            // Ejecuta la función para actualizar la visualización
+            updateDigitDisplay();
+        }
+    }
+}
+
+function selectNextElement() {
+    var digitList = document.getElementById('digitList');
+    var listItems = Array.from(digitList.children);
+
+    // Encuentra el elemento actualmente seleccionado
+    var selectedItem = listItems.find(item => item.classList.contains('selected'));
+
+    if (selectedItem) {
+        // Encuentra el índice del elemento seleccionado
+        var selectedIndex = listItems.indexOf(selectedItem);
+
+        if (selectedIndex < listItems.length - 1) {
+            // Deselecciona el elemento actual
+            selectedItem.classList.remove('selected');
+
+            // Selecciona el elemento siguiente
+            listItems[selectedIndex + 1].classList.add('selected');
+
+            // Actualiza el valor del cuadro de texto con el valor del elemento seleccionado
+            document.getElementById('digit').textContent = listItems[selectedIndex + 1].textContent;
+
+            // Ejecuta la función para actualizar la visualización
+            updateDigitDisplay();
+        }
+    }
+}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+        function updateDigitDisplay() {
+            // Actualizar el contenido de la barra lateral
+            var digit = document.getElementById('digit').textContent.toLowerCase();
+            downloadAndDisplayContent(digit);
+        }
+
+        // Actualizar la visualización inicial
+        updateDigitDisplay();
+    </script>
+</body>
+</html>
+
