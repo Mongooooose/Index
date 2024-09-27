@@ -20,24 +20,24 @@
 		.image-list {
 			background-color: #333; /* Fondo oscuro */
 			padding: 0px; /* Espacio interno */
-			max-width: 240px; /* Ancho m·ximo */
+			max-width: 240px; /* Ancho m√°ximo */
 			margin: 0 auto; /* Centrar horizontalmente */
-			list-style-type: none; /* Quitar estilos de lista (viÒetas, n˙meros) */
+			list-style-type: none; /* Quitar estilos de lista (vi√±etas, n√∫meros) */
 		}
 
 		.image-list li {
 			color: #fff; /* Color de texto blanco */
 			font-family: Arial, sans-serif; /* Fuente del texto */
-			font-size: 11px; /* TamaÒo de fuente m·s pequeÒo */
-			padding: 5px 8px; /* Espacio interno en cada Ìtem de la lista */
-			margin-bottom: 1px; /* Margen inferior entre Ìtems */
+			font-size: 11px; /* Tama√±o de fuente m√°s peque√±o */
+			padding: 5px 8px; /* Espacio interno en cada √≠tem de la lista */
+			margin-bottom: 1px; /* Margen inferior entre √≠tems */
 			border-radius: 3px; /* Bordes redondeados */
-			line-height: 1.0; /* Altura de lÌnea para mejor legibilidad */
+			line-height: 1.0; /* Altura de l√≠nea para mejor legibilidad */
 		}
 
 		.image-list li:hover {
-			background-color: #FF05; /* Cambio de color al pasar el ratÛn */
-			cursor: pointer; /* Cursor tipo puntero al pasar el ratÛn */
+			background-color: #FF05; /* Cambio de color al pasar el rat√≥n */
+			cursor: pointer; /* Cursor tipo puntero al pasar el rat√≥n */
 		}
 	
 	
@@ -56,7 +56,7 @@
             padding: 10px;
         }
 
-        /* Estilos para los dÌgitos */
+        /* Estilos para los d√≠gitos */
         .digit, .image-count, .min-limit, .max-limit{
             color: #c4c4c4;
             font-size: 0.8cm;
@@ -141,8 +141,8 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="max-limit" id="maxlimit" contenteditable="true" >12000</div>
-        <div class="min-limit" id="minlimit" contenteditable="true" >0000</div>
+        <div class="max-limit" id="maxlimit" contenteditable="true" >20000</div>
+        <div class="min-limit" id="minlimit" contenteditable="true" >10000</div>
         <div class="digit" id="digit" contenteditable="true" oninput="updateDigitDisplay()">9er9</div>
         <div class="image-count" id="imageCount">0</div>
 
@@ -162,13 +162,13 @@
 	
 	
         <ul class="digit-list" id="digitList">
-            <!-- AquÌ se mostrar·n los dÌgitos -->
+            <!-- Aqu√≠ se mostrar√°n los d√≠gitos -->
         </ul>
 	
 	
 	
         <ul class="image-list" id="imageList">
-            <!-- AquÌ se mostrar·n las imagenes -->
+            <!-- Aqu√≠ se mostrar√°n las imagenes -->
         </ul>
 
 
@@ -178,7 +178,7 @@
     </div>
 
     <div class="right-content" id="rightContent">
-        <!-- AquÌ se mostrar· el contenido descargado -->
+        <!-- Aqu√≠ se mostrar√° el contenido descargado -->
     </div>
 
     <textarea id="clipboardTextarea" style="position: absolute; left: -9999px; top: -9999px;"></textarea>
@@ -233,7 +233,7 @@ function downloadAndDisplayContent(code) {
                         imageGrid.appendChild(img);
                         imageList.push(imgSrc);
 
-                        // AÒadir la ruta de la imagen a la lista
+                        // A√±adir la ruta de la imagen a la lista
                         var listItem = document.createElement('li');
                         listItem.textContent = imgSrc;
                         imageListElement.appendChild(listItem);
@@ -248,7 +248,7 @@ function downloadAndDisplayContent(code) {
                 document.getElementById('rightContent').appendChild(titleElement);
                 document.getElementById('rightContent').appendChild(imageGrid);
 
-                // Actualizar la cantidad de im·genes
+                // Actualizar la cantidad de im√°genes
                 document.getElementById('imageCount').textContent = imageList.length;
             } else {
                 document.getElementById('rightContent').style.backgroundColor = '#FF0000';
@@ -397,7 +397,7 @@ async function encontrarImagenExistente(nombreImagen) {
             const response = await fetch(imageUrl);
             
             if (response.ok) {
-		return imageUrl; // Retorna la URL completa si la imagen existe y tiene un tamaÒo mayor a 0
+		return imageUrl; // Retorna la URL completa si la imagen existe y tiene un tama√±o mayor a 0
             }
         } catch (error) {
             console.error(`Error al verificar la imagen ${imageUrl}: ${error}`);
@@ -539,24 +539,24 @@ async function encontrarImagenExistente(nombreImagen) {
 
 
 		function generateRandomDigits() {
-			// Obtener los lÌmites de los cuadros de texto
+			// Obtener los l√≠mites de los cuadros de texto
 			var minLimit = document.getElementById('minlimit').textContent.toLowerCase();
 			var maxLimit = document.getElementById('maxlimit').textContent.toLowerCase();
 
-			// Convertir los lÌmites a enteros en base 36
+			// Convertir los l√≠mites a enteros en base 36
 			var minInt = parseInt(minLimit, 36);
 			var maxInt = parseInt(maxLimit, 36);
 
-			// Verificar que los lÌmites sean v·lidos
+			// Verificar que los l√≠mites sean v√°lidos
 			if (isNaN(minInt) || isNaN(maxInt) || minInt >= maxInt) {
-				alert('Por favor, ingrese lÌmites v·lidos.');
+				alert('Por favor, ingrese l√≠mites v√°lidos.');
 				return;
 			}
 
-			// Generar un n˙mero aleatorio dentro de los lÌmites
+			// Generar un n√∫mero aleatorio dentro de los l√≠mites
 			var randomInt = Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt;
 
-			// Convertir el n˙mero aleatorio de vuelta a una cadena en base 36
+			// Convertir el n√∫mero aleatorio de vuelta a una cadena en base 36
 			var randomDigits = randomInt.toString(36);
 
 			// Actualizar el contenido del elemento HTML y llamar a las funciones adicionales
@@ -596,7 +596,7 @@ async function encontrarImagenExistente(nombreImagen) {
 		var seconds = now.getSeconds().toString().padStart(2, '0');
 		
 		var digit = document.getElementById('digit').textContent.trim();
-		// Cambiar el nombre del archivo para usar el dÌgito actual
+		// Cambiar el nombre del archivo para usar el d√≠gito actual
 		var fileName = `${digit}.dlr`;
 		
 		var blob = new Blob([content], { type: 'text/plain' });
@@ -618,15 +618,15 @@ async function encontrarImagenExistente(nombreImagen) {
 	    // Eliminar la clase "selected" de todos los elementos de la lista
 	    listItems.forEach(item => item.classList.remove('selected'));
 
-	    // Verificar si el dÌgito ya est· en la lista
+	    // Verificar si el d√≠gito ya est√° en la lista
 	    var isDuplicate = listItems.some(item => item.textContent === newDigit);
 
 	    if (isDuplicate) {
-		// Si el dÌgito ya existe en la lista, seleccionar el ˙ltimo elemento
+		// Si el d√≠gito ya existe en la lista, seleccionar el √∫ltimo elemento
 		var lastItem = listItems[listItems.length - 1];
 		lastItem.classList.add('selected');
 	    } else {
-		// Si el dÌgito no existe en la lista, agregar un nuevo elemento y seleccionarlo
+		// Si el d√≠gito no existe en la lista, agregar un nuevo elemento y seleccionarlo
 		var listItem = document.createElement('li');
 		listItem.textContent = newDigit;
 		listItem.classList.add('selected'); // Agregar la clase "selected" al nuevo elemento
@@ -667,7 +667,7 @@ function selectPreviousElement() {
     var selectedItem = listItems.find(item => item.classList.contains('selected'));
 
     if (selectedItem) {
-        // Encuentra el Ìndice del elemento seleccionado
+        // Encuentra el √≠ndice del elemento seleccionado
         var selectedIndex = listItems.indexOf(selectedItem);
 
         if (selectedIndex > 0) {
@@ -680,7 +680,7 @@ function selectPreviousElement() {
             // Actualiza el valor del cuadro de texto con el valor del elemento seleccionado
             document.getElementById('digit').textContent = listItems[selectedIndex - 1].textContent;
 
-            // Ejecuta la funciÛn para actualizar la visualizaciÛn
+            // Ejecuta la funci√≥n para actualizar la visualizaci√≥n
             updateDigitDisplay();
         }
     }
@@ -694,7 +694,7 @@ function selectNextElement() {
     var selectedItem = listItems.find(item => item.classList.contains('selected'));
 
     if (selectedItem) {
-        // Encuentra el Ìndice del elemento seleccionado
+        // Encuentra el √≠ndice del elemento seleccionado
         var selectedIndex = listItems.indexOf(selectedItem);
 
         if (selectedIndex < listItems.length - 1) {
@@ -707,7 +707,7 @@ function selectNextElement() {
             // Actualiza el valor del cuadro de texto con el valor del elemento seleccionado
             document.getElementById('digit').textContent = listItems[selectedIndex + 1].textContent;
 
-            // Ejecuta la funciÛn para actualizar la visualizaciÛn
+            // Ejecuta la funci√≥n para actualizar la visualizaci√≥n
             updateDigitDisplay();
         }
     }
@@ -749,7 +749,7 @@ function selectNextElement() {
             downloadAndDisplayContent(digit);
         }
 
-        // Actualizar la visualizaciÛn inicial
+        // Actualizar la visualizaci√≥n inicial
         updateDigitDisplay();
     </script>
 </body>
